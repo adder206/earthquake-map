@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8' />
+  <title>Create interactive hover effects with Mapbox GL JS</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    } 
+
+    .quakeInfo {
+    position: absolute;
+    font-family: sans-serif;
+    margin-top: 5px;
+    margin-left: 5px;
+    padding: 5px;
+    width: 30%;
+    border: 2px solid black;
+    font-size: 14px;
+    color: #222;
+    background-color: #fff;
+    border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div id='map'></div>
+  <div class='quakeInfo'>
+    <div><strong>Magnitude:</strong> <span id='mag'></span></div>
+    <div><strong>Location:</strong> <span id='loc'></span></div>
+    <div><strong>Date:</strong> <span id='date'></span></div>
+  </div>
+
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYWRkZXIyMDYiLCJhIjoiY2tsdmtxeDB4MGczMDJucGIzcXF0eTU4dSJ9.VifXlFychfvat_BpLd1-Ew';
+    var map = new mapboxgl.Map({
+      container: 'map', // Specify the container ID
+      style: 'mapbox://styles/mapbox/outdoors-v11', // Specify which map style to use
+      center: [-122.44121, 37.76132], // Specify the starting position [lng, lat]
+      zoom: 3.5 // Specify the starting zoom
+    });
+    var today = new Date();
+    // Use JavaScript to get the date a week ago
+    var priorDate = new Date().setDate(today.getDate() - 7);
+    // Set that to an ISO8601 timestamp as required by the USGS earthquake API
+    var priorDateTs = new Date(priorDate);
+    var sevenDaysAgo = priorDateTs.toISOString();
+    // Target the span elements used in the sidebar
+    var magDisplay = document.getElementById('mag');
+    var locDisplay = document.getElementById('loc');
+    var dateDisplay = document.getElementById('date');
+
+    map.on('load', function() {
+        map.addSource('earthquakes', {
+            'type': 'geojson',
+            'data': "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&minmagnitude=1&starttime=" + sevenDaysAgo,
+            'generateID'=true // This ensures that all features have unique IDs
+        });
+    });
+    </script>
+
+</body>
+</html>    
